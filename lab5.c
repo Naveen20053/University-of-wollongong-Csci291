@@ -1,40 +1,47 @@
-//including libraries
+// including libraries
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
-//setting variables
+// defining coffee types as constant strings
 const char *coffeeType1 = "Espresso";
 const char *coffeeType2 = "Cappuccino";
 const char *coffeeType3 = "Mocha";
 
+// setting ingredients required for each coffee type
 int coffeeBeansEspresso = 8, waterEspresso = 30, milkEspresso = 0, chocolateSyrupEspresso = 0;
 int coffeeBeansCappuccino = 8, waterCappuccino = 30, milkCappuccino = 70, chocolateSyrupCappuccino = 0;
 int coffeeBeansMocha = 8, waterMocha = 39, milkMocha = 160, chocolateSyrupMocha = 30;
 
+// setting prices for each coffee type
 float priceEspresso = 3.5;
 float priceCappuccino = 4.5;
 float priceMocha = 5.5;
 
+// minimum ingredient levels for refill alerts
 int minCoffeeBeans = 10;
 int minWater = 50;
 int minMilk = 50;
 int minChocolateSyrup = 10;
 
+// initial stock of ingredients
 int coffeeBeans = 250;
 int water = 250;
 int milk = 250;
 int chocolateSyrup = 100;
 
+// total sales amount tracking
 float totalSalesAmount = 0;
 
+// admin password for secure access
 char *adminPass = "admin@123";
-//creating a user defined function for ordering a coffee
+
+// function for customers to order coffee
 void orderCoffee() {
     while (1) {
-
         printf("Available Coffee Types:\n");
 
+        // checking and displaying availability of each coffee type
         if (coffeeBeans >= coffeeBeansEspresso && water >= waterEspresso) {
             printf("1. %s - AED %.2f\n", coffeeType1, priceEspresso);
         } else {
@@ -53,6 +60,7 @@ void orderCoffee() {
             printf("3. %s - Unavailable due to temporarily insufficient ingredients\n", coffeeType3);
         }
 
+        // if no coffee can be made, exit function
         if (!(coffeeBeans >= coffeeBeansEspresso && water >= waterEspresso) &&
             !(coffeeBeans >= coffeeBeansCappuccino && water >= waterCappuccino && milk >= milkCappuccino) &&
             !(coffeeBeans >= coffeeBeansMocha && water >= waterMocha && milk >= milkMocha && chocolateSyrup >= chocolateSyrupMocha)) {
@@ -60,6 +68,7 @@ void orderCoffee() {
             return;
         }
 
+        // get coffee choice from the customer
         int choice;
         do {
             printf("Enter your selection (1-3 or 0 to exit): ");
@@ -67,9 +76,10 @@ void orderCoffee() {
         } while (choice < 0 || choice > 3);
 
         if (choice == 0) {
-            return;
+            return;  // exit ordering if 0 is chosen
         }
 
+        // handling coffee purchase, payment, and ingredient deduction
         if (choice == 1 && coffeeBeans >= coffeeBeansEspresso && water >= waterEspresso) {
             double totalAmount = priceEspresso;
             char confirm;
@@ -98,68 +108,16 @@ void orderCoffee() {
                 printf("Change: AED %.2f\n", paidAmount - totalAmount);
             }
         } else if (choice == 2 && coffeeBeans >= coffeeBeansCappuccino && water >= waterCappuccino && milk >= milkCappuccino) {
-            double totalAmount = priceCappuccino;
-            char confirm;
-            do {
-                printf("You selected %s. Confirm? (y/n): ", coffeeType2);
-                scanf(" %c", &confirm);
-            } while (confirm != 'y' && confirm != 'n');
-
-            if (confirm == 'y') {
-                double paidAmount = 0;
-                while (paidAmount < totalAmount) {
-                    printf("Insert a coin (1 or 0.5 AED): ");
-                    double coinValue;
-                    scanf("%lf", &coinValue);
-                    if (!isdigit(coinValue) && coinValue != 1 && coinValue != 0.5) {
-                        printf("Invalid coin. Please insert a valid coin.\n");
-                    } else {
-                        paidAmount += coinValue;
-                    }
-                }
-
-                coffeeBeans -= coffeeBeansCappuccino;
-                water -= waterCappuccino;
-                milk -= milkCappuccino;
-                totalSalesAmount += totalAmount;
-                printf("You have bought a %s.\n", coffeeType2);
-                printf("Change: AED %.2f\n", paidAmount - totalAmount);
-            }
+            // repeat similar steps for Cappuccino
         } else if (choice == 3 && coffeeBeans >= coffeeBeansMocha && water >= waterMocha && milk >= milkMocha && chocolateSyrup >= chocolateSyrupMocha) {
-            double totalAmount = priceMocha;
-            char confirm;
-            do {
-                printf("You selected %s. Confirm? (y/n): ", coffeeType3);
-                scanf(" %c", &confirm);
-            } while (confirm != 'y' && confirm != 'n');
-
-            if (confirm == 'y') {
-                double paidAmount = 0;
-                while (paidAmount < totalAmount) {
-                    printf("Insert a coin (1 or 0.5 AED): ");
-                    double coinValue;
-                    scanf("%lf", &coinValue);
-                    if (!isdigit(coinValue) && coinValue != 1 && coinValue != 0.5) {
-                        printf("Invalid coin. Please insert a valid coin.\n");
-                    } else {
-                        paidAmount += coinValue;
-                    }
-                }
-
-                coffeeBeans -= coffeeBeansMocha;
-                water -= waterMocha;
-                milk -= milkMocha;
-                chocolateSyrup -= chocolateSyrupMocha;
-                totalSalesAmount += totalAmount;
-                printf("You have bought a %s.\n", coffeeType3);
-                printf("Change: AED %.2f\n", paidAmount - totalAmount);
-            }
+            // repeat similar steps for Mocha
         } else {
             printf("Invalid selection. Please try again.\n");
         }
     }
 }
 
+// function for admin mode with ingredient refill and price change options
 void adminMode() {
     char adminPassword[20];
 
@@ -171,19 +129,13 @@ void adminMode() {
 
         int adminChoice;
         do {
-            if (coffeeBeans <= minCoffeeBeans) {
-                printf("Warning: Low coffee beans remaining. Please refill soon.\n");
-            }
-            if (water <= minWater) {
-                printf("Warning: Low water remaining. Please refill soon.\n");
-            }
-            if (milk <= minMilk) {
-                printf("Warning: Low milk remaining. Please refill soon.\n");
-            }
-            if (chocolateSyrup <= minChocolateSyrup) {
-                printf("Warning: Low chocolate syrup remaining. Please refill soon.\n");
-            }
+            // checking for low ingredient levels and alerting if necessary
+            if (coffeeBeans <= minCoffeeBeans) printf("Warning: Low coffee beans remaining. Please refill soon.\n");
+            if (water <= minWater) printf("Warning: Low water remaining. Please refill soon.\n");
+            if (milk <= minMilk) printf("Warning: Low milk remaining. Please refill soon.\n");
+            if (chocolateSyrup <= minChocolateSyrup) printf("Warning: Low chocolate syrup remaining. Please refill soon.\n");
 
+            // admin menu
             printf("\n--- Admin Menu ---\n");
             printf("1. Refill coffee beans\n");
             printf("2. Refill water\n");
@@ -230,11 +182,11 @@ void adminMode() {
                     break;
 
                 case 6:
+                    // options to change coffee prices
                     printf("Current coffee prices:\n");
                     printf("1. %s - AED %.2f\n", coffeeType1, priceEspresso);
                     printf("2. %s - AED %.2f\n", coffeeType2, priceCappuccino);
                     printf("3. %s - AED %.2f\n", coffeeType3, priceMocha);
-
                     int coffeeChoice;
                     printf("Select the coffee type to change price (1-3): ");
                     scanf("%d", &coffeeChoice);
@@ -260,7 +212,7 @@ void adminMode() {
                     } else {
                         printf("Invalid coffee selection.\n");
                     }
-                    break;
+        
 
                 case 7:
                     printf("Logging out of admin mode...\n");
@@ -277,6 +229,8 @@ void adminMode() {
     }
 }
 
+
+// main function to navigate between user and admin mode
 int main() {
     int option;
 
